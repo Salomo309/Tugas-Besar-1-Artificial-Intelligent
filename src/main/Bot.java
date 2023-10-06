@@ -1,3 +1,5 @@
+package main;
+
 public class Bot {
     public int[] move() {
         // create random move
