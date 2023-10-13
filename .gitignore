@@ -23,7 +23,7 @@
 hs_err_pid*
 
 .idea
-out
+out/
 
 javafx-sdk-linux
 javafx-sdk
