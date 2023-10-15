@@ -77,7 +77,7 @@ public class InputFrameController{
             Stage primaryStage = (Stage) this.player1.getScene().getWindow();
             primaryStage.close();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("main/OutputFrame.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OutputFrame.fxml"));
             Parent root = loader.load();
 
             // Get controller of output frame and pass input including player names and number of rounds chosen.

@@ -345,7 +345,7 @@ public class OutputFrameController {
         secondaryStage.close();
 
         // Reopen primary stage/input frame.
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main/InputFrame.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("InputFrame.fxml"));
         Parent root = loader.load();
         Stage primaryStage = new Stage();
         primaryStage.setTitle("Adjacency Gameplay");
