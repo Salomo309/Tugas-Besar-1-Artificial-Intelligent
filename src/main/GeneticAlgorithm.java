@@ -77,13 +77,13 @@ class GeneticAlgorithm {
 
         int total = this.getFitnessValue(population[0]) + this.getFitnessValue(population[1]) + this.getFitnessValue(population[2]) + this.getFitnessValue(population[3]);
 
-        int rangeA = this.getFitnessValue(population[0]) * 100 / total;
-        int rangeB = rangeA + this.getFitnessValue(population[1]) * 100 / total;
-        int rangeC = rangeB + this.getFitnessValue(population[2]) * 100 / total;
+        double rangeA = (double) this.getFitnessValue(population[0]) / total;
+        double rangeB = rangeA + (double) this.getFitnessValue(population[1]) / total;
+        double rangeC = rangeB + (double) this.getFitnessValue(population[2]) / total;
         // int rangeD = rangeC + this.getFitnessValue(population[3]);
 
         for (int i = 0; i < 4; i++) {
-            int randomValue = random.nextInt(101);
+            double randomValue = random.nextDouble(101);
 
             if (randomValue <= rangeA) {
                 parents[i] = population[0];
