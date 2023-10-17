@@ -58,7 +58,6 @@ public class OutputFrameController {
     private static final int ROW = 8;
     private static final int COL = 8;
     private Button[][] buttons = new Button[ROW][COL];
-    private String[][] board = new String[ROW][COL];
 
 
     /**
@@ -79,12 +78,12 @@ public class OutputFrameController {
         this.roundsLeft = Integer.parseInt(rounds);
         this.isBotFirst = isBotFirst;
 
-        // // Start bot
-        // this.bot = new Bot();
-        // this.playerXTurn = !isBotFirst;
-        // if (this.isBotFirst) {
-        //     this.moveBot();
-        // }
+        // Start bot
+        this.bot = new Bot();
+        this.playerXTurn = !isBotFirst;
+        if (this.isBotFirst) {
+            this.moveBot();
+        }
     }
 
 
@@ -97,14 +96,6 @@ public class OutputFrameController {
      */
     @FXML
     private void initialize() {
-
-        // Start bot
-        this.bot = new Bot();
-        this.playerXTurn = !isBotFirst;
-        if (this.isBotFirst) {
-            this.moveBot();
-        }
-
         // Construct game board with 8 rows.
         for (int i = 0; i < ROW; i++) {
             RowConstraints rowConst = new RowConstraints();
@@ -132,8 +123,6 @@ public class OutputFrameController {
                 final int finalI = i;
                 final int finalJ = j;
                 this.buttons[i][j].setOnAction(event -> this.selectedCoordinates(finalI, finalJ));
-                
-                board[i][j] = "-";
             }
         }
 
@@ -146,15 +135,6 @@ public class OutputFrameController {
         this.buttons[0][COL - 1].setText("O");
         this.buttons[1][COL - 2].setText("O");
         this.buttons[1][COL - 1].setText("O");
-
-        this.board[ROW - 2][0] = "X";
-        this.board[ROW - 1][0] = "X";
-        this.board[ROW - 2][1] = "X";
-        this.board[ROW - 1][1] = "X";
-        this.board[0][COL - 2] = "O";
-        this.board[0][COL - 1] = "O";
-        this.board[1][COL - 2] = "O";
-        this.board[1][COL - 1] = "O";
 
 
         // Construct score board with 8 rows.
@@ -181,8 +161,6 @@ public class OutputFrameController {
         this.playerXTurn = true;
         this.playerXScore = 4;
         this.playerOScore = 4;
-
-        this.bot.setBoardState(this.board);
     }
 
 
@@ -205,9 +183,6 @@ public class OutputFrameController {
                 this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
                 this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
                 this.buttons[i][j].setText("X");  // Mark the board with X.
-
-                board[i][j] = "X";
-
                 this.playerXScore++;              // Increment the score of player X.
 
                 // Update game board by changing surrounding cells to X if applicable.
@@ -230,9 +205,6 @@ public class OutputFrameController {
                 this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
                 this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
                 this.buttons[i][j].setText("O");
-
-                this.board[i][j] = "O";
-
                 this.playerOScore++;
 
                 this.updateGameBoard(i, j);
@@ -297,25 +269,17 @@ public class OutputFrameController {
 
         this.playerXScoreLabel.setText(String.valueOf(this.playerXScore));
         this.playerOScoreLabel.setText(String.valueOf(this.playerOScore));
-
-        this.bot.setBoardState(this.board);
     }
 
     private void setPlayerScore(int i, int j){
         if (this.playerXTurn) {
             if (this.buttons[i][j].getText().equals("O")) {
                 this.buttons[i][j].setText("X");
-
-                this.board[i][j] = "X";
-
                 this.playerXScore++;
                 this.playerOScore--;
             }
         } else if (this.buttons[i][j].getText().equals("X")) {
             this.buttons[i][j].setText("O");
-
-            this.board[i][j] = "O";
-
             this.playerOScore++;
             this.playerXScore--;
         }
@@ -391,7 +355,7 @@ public class OutputFrameController {
     }
 
     private void moveBot() {
-        int[] botMove = this.bot.move();
+        int[] botMove = this.bot.move(this.buttons);
         int i = botMove[0];
         int j = botMove[1];
 
