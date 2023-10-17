@@ -46,11 +46,11 @@ mv javafx-sdk-11.0.2 javafx-sdk-linux
 ```
 3. Compile the program
 ```
-javac -cp ./src --module-path "./javafx-sdk-linux/lib" --add-modules=javafx.controls,javafx.fxml src/*.java
+javac -cp ./src --module-path "./javafx-sdk-linux/lib" --add-modules=javafx.controls,javafx.fxml src/main/*.java
 ```
 4. Run the program
 ```
-java -cp ./src --module-path "./javafx-sdk-linux/lib" --add-modules=javafx.controls,javafx.fxml Main
+java -cp ./src --module-path "./javafx-sdk-linux/lib" --add-modules=javafx.controls,javafx.fxml main.Main
 ```
 
 <hr>
