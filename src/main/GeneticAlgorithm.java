@@ -38,7 +38,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         return count;
     }
 
-    public int getFitnessValue(int[] individual, char[][] boardGame) {
+    public int getFitnessValue(int[] individual, char[][] boardGame, boolean isBotFirst) {
         char[][] board = boardGame;
         int currentPlayer = 1;
 
@@ -69,32 +69,39 @@ class GeneticAlgorithm implements BotAlgorithm {
             currentPlayer = 3 - currentPlayer;
         }
 
-        int botCount = countMarks(board, 'X');
-        int playerCount = countMarks(board, 'O');
-        int fitnessValue = botCount - playerCount;
+        int xCount = countMarks(board, 'X');
+        int oCount = countMarks(board, 'O');
+
+        int fitnessValue = 0;
+
+        if (isBotFirst) {
+            fitnessValue = xCount - oCount;
+        } else {
+            fitnessValue = oCount - xCount;
+        }
 
         return fitnessValue;
     }
 
-    public int[][] selection(int[][] population, char[][] boardGame) {
+    public int[][] selection(int[][] population, char[][] boardGame, boolean isBotFirst) {
         Random random = new Random();
         int[][] parents = new int[16][];
 
         int total = 0;
 
         for (int i = 0; i < population.length; i++) {
-            total += this.getFitnessValue(population[i], boardGame);
+            total += this.getFitnessValue(population[i], boardGame, isBotFirst);
         }
 
         double[] range = new double[16];
-        range[0] = (double) this.getFitnessValue(population[0], boardGame) * 100 / total;
+        range[0] = (double) this.getFitnessValue(population[0], boardGame, isBotFirst) * 100 / total;
         // System.out.println(range[0]);
         for (int i = 1; i < 16; i++) {
-            if (range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total < 0) {
+            if (range[i - 1] + (double) this.getFitnessValue(population[i], boardGame, isBotFirst) * 100 / total < 0) {
                 range[i] = 0;
             } else {
 
-                range[i] = range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total;
+                range[i] = range[i - 1] + (double) this.getFitnessValue(population[i], boardGame, isBotFirst) * 100 / total;
             }
         }
         range[15] = 100;
@@ -160,14 +167,14 @@ class GeneticAlgorithm implements BotAlgorithm {
     //     }
     // }
 
-    public int[] getBestMove(int generations, int rounds, char[][] boardGame) {
+    public int[] getBestMove(int generations, int rounds, char[][] boardGame, boolean isBotFirst) {
         int[][] currentPopulation = generateInitialPopulation(rounds);
 
         for (int generation = 0; generation < generations; generation++) {
             System.out.println(generation);
 
             // Selection
-            int[][] selectedParents = selection(currentPopulation, boardGame);
+            int[][] selectedParents = selection(currentPopulation, boardGame, isBotFirst);
             // printParents(selectedParents);
 
             // Crossover
@@ -191,7 +198,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         int bestFitness = Integer.MIN_VALUE;
         int[] bestMove = null;
         for (int i = 0; i < currentPopulation.length; i++) {
-            int fitness = getFitnessValue(currentPopulation[i], boardGame);
+            int fitness = getFitnessValue(currentPopulation[i], boardGame, isBotFirst);
             if (fitness > bestFitness) {
                 bestFitness = fitness;
                 bestMove = currentPopulation[i];
@@ -201,14 +208,14 @@ class GeneticAlgorithm implements BotAlgorithm {
         return bestMove;
     }
 
-    public int[] getBestMove(char[][] board) {
+    public int[] getBestMove(char[][] board, boolean isBotFirst) {
         char[][] boardGame = new char[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 boardGame[i][j] = board[i][j];
             }
         }
-        int[] result =  getBestMove(this.generations, this.rounds, boardGame);
+        int[] result =  getBestMove(this.generations, this.rounds, boardGame, isBotFirst);
         this.rounds--;
         return result;
     }
