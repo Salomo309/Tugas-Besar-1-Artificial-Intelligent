@@ -3,14 +3,14 @@ package main;
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
-    private String[][] board;
+    private char[][] board;
 
     public Bot() {
         // Initialize the board with empty cells
-        board = new String[ROW][COL];
+        board = new char[ROW][COL];
     }
 
-    public void setBoardState(String[][] newBoard) {
+    public void setBoardState(char[][] newBoard) {
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
                 board[i][j] = newBoard[i][j];
@@ -37,93 +37,62 @@ public class Bot {
         int bestScore = Integer.MIN_VALUE;
         int[] bestMove = new int[2];
 
-        for (int i = 0; i < ROW; i++) {
-            for (int j = 0; j < COL; j++) {
-                if (isEmptyCell(i, j)) {
-                    makeMove(i, j, "O"); // Bot's move
-
-                    // call minimax
-                    int score = minimax(3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
-
-                    undoMove(i, j);
-
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMove[0] = i;
-                        bestMove[1] = j;
-                    }
-                }
+        BoardIterator it = new BoardIterator(board, 'O');
+        char[][] state;
+        while ((state = it.next()) != null) {
+            int score = minimax(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+            // System.out.printf("Score for move (%d, %d): %d\n", it.getMove()[0], it.getMove()[1], score);
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = it.getMove();
             }
         }
-
         return bestMove;
     }
 
-    public int minimax(int depth, int alpha, int beta, boolean isMaximizing) {
+    public int minimax(char[][] board, int depth, int alpha, int beta, boolean isMaximizing) {
         if (depth == 0) {
-            return evaluate();
+            return evaluate(board);
         }
 
         if (isMaximizing) {
             int maxScore = Integer.MIN_VALUE;
-            for (int i = 0; i < ROW; i++) {
-                for (int j = 0; j < COL; j++) {
-                    if (isEmptyCell(i, j)) {
-                        makeMove(i, j, "O");
-                        int score = minimax(depth - 1, alpha, beta, false);
-                        undoMove(i, j);
-                        maxScore = Math.max(maxScore, score);
-                        alpha = Math.max(alpha, score);
-                        if (beta <= alpha) {
-                            break; // Prune the tree
-                        }
-                    }
+            BoardIterator it = new BoardIterator(board, 'O');
+            char[][] state;
+            while((state = it.next()) != null) {
+                int score = minimax(state, depth - 1, alpha, beta, false);
+                maxScore = Math.max(maxScore, score);
+                alpha = Math.max(alpha, score);
+                if (beta <= alpha) {
+                    break;
                 }
             }
             return maxScore;
         } else {
             int minScore = Integer.MAX_VALUE;
-            for (int i = 0; i < ROW; i++) {
-                for (int j = 0; j < COL; j++) {
-                    if (isEmptyCell(i, j)) {
-                        makeMove(i, j, "X");
-                        int score = minimax(depth - 1, alpha, beta, true);
-                        undoMove(i, j);
-                        minScore = Math.min(minScore, score);
-                        beta = Math.min(beta, score);
-                        if (beta <= alpha) {
-                            break; // Prune the tree
-                        }
-                    }
+            BoardIterator it = new BoardIterator(board, 'X');
+            char[][] state;
+            while((state = it.next()) != null) {
+                int score = minimax(state, depth - 1, alpha, beta, true);
+                minScore = Math.min(minScore, score);
+                beta = Math.min(beta, score);
+                if (beta <= alpha) {
+                    break;
                 }
             }
             return minScore;
         }
     }
 
-    private boolean isEmptyCell(int row, int col) {
-        return board[row][col] == "-";
-    }
-
-    private void makeMove(int row, int col, String player) {
-        board[row][col] = player;
-        // Update the board state according to your game rules
-    }
-
-    private void undoMove(int row, int col) {
-        board[row][col] = "-";
-        // Restore the board state to the previous state
-    }
-
-    private int evaluate() {
+    private int evaluate(char[][] board) {
         int botScore = 0;
         int opponentScore = 0;
 
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
-                if (board[i][j].equals("O")) {
+                if (board[i][j] == 'O') {
                     botScore++;
-                } else if (board[i][j].equals("X")) {
+                } else if (board[i][j] == 'X') {
                     opponentScore++;
                 }
             }

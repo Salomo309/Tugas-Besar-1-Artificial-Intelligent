@@ -58,7 +58,7 @@ public class OutputFrameController {
     private static final int ROW = 8;
     private static final int COL = 8;
     private Button[][] buttons = new Button[ROW][COL];
-    private String[][] board = new String[ROW][COL];
+    private char[][] board = new char[ROW][COL];
 
 
     /**
@@ -133,7 +133,7 @@ public class OutputFrameController {
                 final int finalJ = j;
                 this.buttons[i][j].setOnAction(event -> this.selectedCoordinates(finalI, finalJ));
                 
-                board[i][j] = "-";
+                board[i][j] = '-';
             }
         }
 
@@ -147,14 +147,14 @@ public class OutputFrameController {
         this.buttons[1][COL - 2].setText("O");
         this.buttons[1][COL - 1].setText("O");
 
-        this.board[ROW - 2][0] = "X";
-        this.board[ROW - 1][0] = "X";
-        this.board[ROW - 2][1] = "X";
-        this.board[ROW - 1][1] = "X";
-        this.board[0][COL - 2] = "O";
-        this.board[0][COL - 1] = "O";
-        this.board[1][COL - 2] = "O";
-        this.board[1][COL - 1] = "O";
+        this.board[ROW - 2][0] = 'X';
+        this.board[ROW - 1][0] = 'X';
+        this.board[ROW - 2][1] = 'X';
+        this.board[ROW - 1][1] = 'X';
+        this.board[0][COL - 2] = 'O';
+        this.board[0][COL - 1] = 'O';
+        this.board[1][COL - 2] = 'O';
+        this.board[1][COL - 1] = 'O';
 
 
         // Construct score board with 8 rows.
@@ -206,7 +206,7 @@ public class OutputFrameController {
                 this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
                 this.buttons[i][j].setText("X");  // Mark the board with X.
 
-                board[i][j] = "X";
+                board[i][j] = 'X';
 
                 this.playerXScore++;              // Increment the score of player X.
 
@@ -231,7 +231,7 @@ public class OutputFrameController {
                 this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
                 this.buttons[i][j].setText("O");
 
-                this.board[i][j] = "O";
+                this.board[i][j] = 'O';
 
                 this.playerOScore++;
 
@@ -306,7 +306,7 @@ public class OutputFrameController {
             if (this.buttons[i][j].getText().equals("O")) {
                 this.buttons[i][j].setText("X");
 
-                this.board[i][j] = "X";
+                this.board[i][j] = 'X';
 
                 this.playerXScore++;
                 this.playerOScore--;
@@ -314,7 +314,7 @@ public class OutputFrameController {
         } else if (this.buttons[i][j].getText().equals("X")) {
             this.buttons[i][j].setText("O");
 
-            this.board[i][j] = "O";
+            this.board[i][j] = 'O';
 
             this.playerOScore++;
             this.playerXScore--;
@@ -394,7 +394,7 @@ public class OutputFrameController {
         int[] botMove = this.bot.move();
         int i = botMove[0];
         int j = botMove[1];
-
+        
         if (!this.buttons[i][j].getText().equals("")) {
             new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
             System.exit(1);
