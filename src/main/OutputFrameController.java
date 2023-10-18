@@ -18,8 +18,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 
 import java.io.IOException;
-import java.nio.channels.InterruptedByTimeoutException;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * The OutputFrameController class.  It controls button input from the users when
@@ -66,9 +64,6 @@ public class OutputFrameController {
     private static final int COL = 8;
     private Button[][] buttons = new Button[ROW][COL];
     private char[][] board = new char[ROW][COL];
-
-    private Task<Void> moveBotO;
-    private Task<Void> moveBotX;
 
 
     /**
@@ -131,8 +126,14 @@ public class OutputFrameController {
         this.playerXTurn = !isBotFirst;
 
         if (this.isBotFirst) {
+            synchronized (botO) {
+                botO.notifyAll();
+            }
             this.moveBot(botO);
         } else if (this.isBotVsBot) {
+            synchronized (botX) {
+                botX.notifyAll();
+            }
             this.moveBot(botX);
         }
     }
@@ -441,6 +442,13 @@ public class OutputFrameController {
     private void moveBot(Bot bot) {
         Thread taskThread = new Thread(() -> {
             Platform.runLater(() -> {
+                try {
+                    synchronized (bot) {
+                        bot.wait(100);
+                    }
+                } catch (InterruptedException e) {
+                    System.exit(1);
+                }
                 int[] botMove = bot.getBestMove();
                 int i = botMove[0];
                 int j = botMove[1];
@@ -452,12 +460,10 @@ public class OutputFrameController {
                 }
 
                 selectedCoordinates(i, j);
+                synchronized (bot) {
+                    bot.notifyAll();
+                }
             });
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                System.exit(1);
-            }
         });
         taskThread.start();
     }
