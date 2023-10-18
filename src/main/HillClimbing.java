@@ -4,7 +4,8 @@ public class HillClimbing implements BotAlgorithm {
     private static final int ROW = 8;
     private static final int COL = 8;
     
-    public int[] getBestMove(char[][] board) {
+    public int[] getBestMove(char[][] board, char mark) {
+        // TODO: implements getBestMove with mark parameter
         // create random move
         // return new int[]{(int) (Math.random()*8), (int) (Math.random()*8)};
 

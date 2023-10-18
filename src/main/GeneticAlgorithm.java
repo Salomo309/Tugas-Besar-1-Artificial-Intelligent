@@ -287,7 +287,8 @@ class GeneticAlgorithm implements BotAlgorithm {
         return bestMove;
     }
 
-    public int[] getBestMove(char[][] board) {
+    public int[] getBestMove(char[][] board, char mark) {
+        // TODO: implements getBestMove with mark parameter
         char[][] boardGame = new char[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {

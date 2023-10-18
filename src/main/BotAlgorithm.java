@@ -1,5 +1,5 @@
 package main;
 
 public interface BotAlgorithm {
-    public int[] getBestMove(char[][] board);
+    public int[] getBestMove(char[][] board, char mark);
 }

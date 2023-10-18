@@ -5,7 +5,7 @@ public class Minimax implements BotAlgorithm {
     private static final int COL = 8;
 
     @Override
-    public int[] getBestMove(char[][] board) {
+    public int[] getBestMove(char[][] board, char mark) {
 
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
@@ -20,10 +20,10 @@ public class Minimax implements BotAlgorithm {
         int bestScore = Integer.MIN_VALUE;
         int[] bestMove = new int[2];
 
-        BoardIterator it = new BoardIterator(board, 'O');
+        BoardIterator it = new BoardIterator(board, mark);
         char[][] state;
         while ((state = it.next()) != null) {
-            int score = minimax(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+            int score = minimax(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, mark == 'X');
             // System.out.printf("Score for move (%d, %d): %d\n", it.getMove()[0], it.getMove()[1], score);
             if (score > bestScore) {
                 bestScore = score;
