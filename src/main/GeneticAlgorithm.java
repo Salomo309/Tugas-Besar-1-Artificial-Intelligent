@@ -82,6 +82,7 @@ class GeneticAlgorithm {
 
         double[] range = new double[16];
         range[0] = (double) this.getFitnessValue(population[0]) * 100 / total;
+        // System.out.println(range[0]);
         for (int i = 1; i < 16; i++) {
             range[i] = range[i - 1] + (double) this.getFitnessValue(population[i]) * 100 / total;
         }
@@ -134,76 +135,106 @@ class GeneticAlgorithm {
         return mutatedIndividual;
     }
 
-    public int[] getBestMove(int rounds, int iterations) {
-        int[][] currentPopulation = generateInitialPopulation(rounds);
-        int[] bestIndividual = currentPopulation[0]; // Inisialisasi individu terbaik dengan individu pertama
+    // public void printIndividual(int[] individual) {
+    //     System.out.print("Individual Chromosome: [");
+    //     for (int i = 0; i < individual.length; i++) {
+    //         System.out.print(individual[i]);
+    //         if (i < individual.length - 1) {
+    //             System.out.print(", ");
+    //         }
+    //     }
+    //     System.out.println("]");
+    // }
 
-        for (int iter = 0; iter < iterations; iter++) {
-            // Seleksi
+    // public void printParents(int[][] parents) {
+    //     for (int i = 0; i < parents.length; i++) {
+    //         System.out.print("Parent " + (i + 1) + ": ");
+    //         printIndividual(parents[i]);
+    //     }
+    // }
+
+    public int[] getBestMove(int generations, int rounds) {
+        int[][] currentPopulation = generateInitialPopulation(rounds);
+
+        for (int generation = 0; generation < generations; generation++) {
+            // Selection
             int[][] selectedParents = selection(currentPopulation);
-            System.out.println(iter);
 
             // Crossover
             int[][] newPopulation = new int[16][rounds];
-            for (int i = 0; i < 16; i += 2) {
-                int[] parent1 = selectedParents[i];
-                int[] parent2 = selectedParents[i + 1];
+            for (int i = 1; i < 16; i += 2) {
+                int[] parent1 = selectedParents[i - 1];
+                int[] parent2 = selectedParents[i];
                 int[][] children = crossover(parent1, parent2);
-                newPopulation[i] = children[0];
-                newPopulation[i + 1] = children[1];
+                newPopulation[i - 1] = children[0];
+                newPopulation[i] = children[1];
             }
 
-            // Mutasi
+            // Mutation
             for (int i = 0; i < newPopulation.length; i++) {
                 newPopulation[i] = mutate(newPopulation[i]);
             }
 
+            // Update current population with the new population
             currentPopulation = newPopulation;
-
-            // Cari individu terbaik dalam populasi saat ini
-            int bestFitness = getFitnessValue(bestIndividual);
-            for (int i = 0; i < currentPopulation.length; i++) {
-                int fitness = getFitnessValue(currentPopulation[i]);
-                if (fitness > bestFitness) {
-                    bestFitness = fitness;
-                    bestIndividual = currentPopulation[i];
-                }
-            }
         }
 
-        // Hitung langkah terbaik dari individu terbaik
-        int[] bestMove = bestIndividual;
+        // Find the best individual with the highest fitness value
+        int bestFitness = Integer.MIN_VALUE;
+        int[] bestMove = null;
+        for (int i = 0; i < currentPopulation.length; i++) {
+            int fitness = getFitnessValue(currentPopulation[i]);
+            if (fitness > bestFitness) {
+                bestFitness = fitness;
+                bestMove = currentPopulation[i];
+            }
+        }
 
         return bestMove;
     }
 
     public static void main(String[] args) {
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-        System.out.println(geneticAlgorithm.getBestMove(28, 10));
-        // int rounds = 28; //
+        System.out.println(geneticAlgorithm.getBestMove(500, 28));
 
+        // // Buat populasi awal
+        // int rounds = 28;
         // int[][] initialPopulation = geneticAlgorithm.generateInitialPopulation(rounds);
 
         // // Menampilkan populasi awal
         // System.out.println("Initial Population:");
-        // for (int i = 0; i < initialPopulation.length; i++) {
+        // for (int i = 0; i < 16; i++) {
         //     System.out.println("Individual " + (i + 1) + ": " + Arrays.toString(initialPopulation[i]));
         // }
 
-        // int rounds = 28; // Ganti dengan jumlah ronde yang sesuai
-
-        // int[][] initialPopulation = geneticAlgorithm.generateInitialPopulation(rounds);
-
-        // // Menampilkan populasi awal
-        // System.out.println("Initial Population:");
-        // for (int i = 0; i < 4; i++) {
-        //     System.out.println("Individual " + (i + 1) + ": " + Arrays.toString(initialPopulation[i]));
+        // // Selection
+        // int[][] selectedParents = geneticAlgorithm.selection(initialPopulation);
+        // System.out.println("\nSelected Parents:");
+        // for (int i = 0; i < 16; i++) {
+        //     System.out.println("Parent " + (i + 1) + ": " + Arrays.toString(selectedParents[i]));
         // }
 
-        // // Menghitung nilai fitness untuk setiap individu dalam populasi awal
-        // for (int i = 0; i < 4; i++) {
-        //     int fitnessValue = geneticAlgorithm.getFitnessValue(initialPopulation[i]);
-        //     System.out.println("Fitness Value for Individual " + (i + 1) + ": " + fitnessValue);
+        // // Crossover
+        // int[][] newPopulation = new int[16][rounds];
+        // for (int i = 1; i < 16; i += 2) {
+        //     int[] parent1 = selectedParents[i - 1];
+        //     int[] parent2 = selectedParents[i];
+        //     int[][] children = geneticAlgorithm.crossover(parent1, parent2);
+        //     newPopulation[i - 1] = children[0];
+        //     newPopulation[i] = children[1];
+        // }
+        // System.out.println("\nNew Population After Crossover:");
+        // for (int i = 0; i < 16; i++) {
+        //     System.out.println("Individual " + (i + 1) + ": " + Arrays.toString(newPopulation[i]));
+        // }
+
+        // // Mutate
+        // for (int i = 0; i < newPopulation.length; i++) {
+        //     newPopulation[i] = geneticAlgorithm.mutate(newPopulation[i]);
+        // }
+        // System.out.println("\nNew Population After Mutation:");
+        // for (int i = 0; i < 16; i++) {
+        //     System.out.println("Individual " + (i + 1) + ": " + Arrays.toString(newPopulation[i]));
         // }
     }
 }
