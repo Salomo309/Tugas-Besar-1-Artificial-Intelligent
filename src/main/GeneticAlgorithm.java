@@ -135,7 +135,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         range[15] = 100;
 
         for (int i = 0; i < 16; i++) {
-            double randomValue = random.nextDouble(100);
+            double randomValue = random.nextDouble() * 100;
 
             for (int j = 0; j < 16; j++) {
                 if (randomValue <= range[j]) {
