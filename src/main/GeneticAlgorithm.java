@@ -5,10 +5,10 @@ import java.util.Random;
 
 class GeneticAlgorithm {
     public int[][] generateInitialPopulation(int rounds) {
-        int[][] initialPopulation = new int[4][rounds];
+        int[][] initialPopulation = new int[16][rounds];
         Random random = new Random();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 16; i++) {
             for (int j = 0; j < rounds; j++) {
                 int position = random.nextInt(64) + 1;
                 initialPopulation[i][j] = position;
@@ -70,29 +70,35 @@ class GeneticAlgorithm {
 
 
 
-    public int[][] selection(int rounds) {
-        int[][] population = this.generateInitialPopulation(rounds);
+    public int[][] selection(int[][] population) {
         Random random = new Random();
-        int[][] parents = new int[4][];
+        int[][] parents = new int[16][];
 
-        int total = this.getFitnessValue(population[0]) + this.getFitnessValue(population[1]) + this.getFitnessValue(population[2]) + this.getFitnessValue(population[3]);
+        int total = 0;
 
-        double rangeA = (double) this.getFitnessValue(population[0]) / total;
-        double rangeB = rangeA + (double) this.getFitnessValue(population[1]) / total;
-        double rangeC = rangeB + (double) this.getFitnessValue(population[2]) / total;
+        for (int i = 0; i < population.length; i++) {
+            total += this.getFitnessValue(population[i]);
+        }
+
+        double[] range = new double[16];
+        range[0] = (double) this.getFitnessValue(population[0]) * 100 / total;
+        for (int i = 1; i < 16; i++) {
+            range[i] = range[i - 1] + (double) this.getFitnessValue(population[i]) * 100 / total;
+        }
+
+        // double rangeA = (double) this.getFitnessValue(population[0]) / total;
+        // double rangeB = rangeA + (double) this.getFitnessValue(population[1]) / total;
+        // double rangeC = rangeB + (double) this.getFitnessValue(population[2]) / total;
         // int rangeD = rangeC + this.getFitnessValue(population[3]);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 16; i++) {
             double randomValue = random.nextDouble(101);
 
-            if (randomValue <= rangeA) {
-                parents[i] = population[0];
-            } else if (randomValue <= rangeB && randomValue > rangeA) {
-                parents[i] = population[1];
-            } else if (randomValue <= rangeC && randomValue > rangeB) {
-                parents[i] = population[2];
-            } else {
-                parents[i] = population[3];
+            for (int j = 0; j < 16; j++) {
+                if (randomValue > (j > 0 ? range[j - 1] : 0) && randomValue <= range[j]) {
+                    parents[i] = population[j];
+                    break;
+                }
             }
         }
 
@@ -128,8 +134,52 @@ class GeneticAlgorithm {
         return mutatedIndividual;
     }
 
+    public int[] getBestMove(int rounds, int iterations) {
+        int[][] currentPopulation = generateInitialPopulation(rounds);
+        int[] bestIndividual = currentPopulation[0]; // Inisialisasi individu terbaik dengan individu pertama
+
+        for (int iter = 0; iter < iterations; iter++) {
+            // Seleksi
+            int[][] selectedParents = selection(currentPopulation);
+            System.out.println(iter);
+
+            // Crossover
+            int[][] newPopulation = new int[16][rounds];
+            for (int i = 0; i < 16; i += 2) {
+                int[] parent1 = selectedParents[i];
+                int[] parent2 = selectedParents[i + 1];
+                int[][] children = crossover(parent1, parent2);
+                newPopulation[i] = children[0];
+                newPopulation[i + 1] = children[1];
+            }
+
+            // Mutasi
+            for (int i = 0; i < newPopulation.length; i++) {
+                newPopulation[i] = mutate(newPopulation[i]);
+            }
+
+            currentPopulation = newPopulation;
+
+            // Cari individu terbaik dalam populasi saat ini
+            int bestFitness = getFitnessValue(bestIndividual);
+            for (int i = 0; i < currentPopulation.length; i++) {
+                int fitness = getFitnessValue(currentPopulation[i]);
+                if (fitness > bestFitness) {
+                    bestFitness = fitness;
+                    bestIndividual = currentPopulation[i];
+                }
+            }
+        }
+
+        // Hitung langkah terbaik dari individu terbaik
+        int[] bestMove = bestIndividual;
+
+        return bestMove;
+    }
+
     public static void main(String[] args) {
-        // GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
+        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
+        System.out.println(geneticAlgorithm.getBestMove(28, 10));
         // int rounds = 28; //
 
         // int[][] initialPopulation = geneticAlgorithm.generateInitialPopulation(rounds);
