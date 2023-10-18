@@ -87,16 +87,11 @@ class GeneticAlgorithm {
             range[i] = range[i - 1] + (double) this.getFitnessValue(population[i]) * 100 / total;
         }
 
-        // double rangeA = (double) this.getFitnessValue(population[0]) / total;
-        // double rangeB = rangeA + (double) this.getFitnessValue(population[1]) / total;
-        // double rangeC = rangeB + (double) this.getFitnessValue(population[2]) / total;
-        // int rangeD = rangeC + this.getFitnessValue(population[3]);
-
         for (int i = 0; i < 16; i++) {
-            double randomValue = random.nextDouble(101);
+            double randomValue = random.nextDouble(100);
 
             for (int j = 0; j < 16; j++) {
-                if (randomValue > (j > 0 ? range[j - 1] : 0) && randomValue <= range[j]) {
+                if (randomValue <= range[j]) {
                     parents[i] = population[j];
                     break;
                 }
@@ -157,6 +152,8 @@ class GeneticAlgorithm {
         int[][] currentPopulation = generateInitialPopulation(rounds);
 
         for (int generation = 0; generation < generations; generation++) {
+            // System.out.println(generation);
+            
             // Selection
             int[][] selectedParents = selection(currentPopulation);
 
@@ -175,11 +172,9 @@ class GeneticAlgorithm {
                 newPopulation[i] = mutate(newPopulation[i]);
             }
 
-            // Update current population with the new population
             currentPopulation = newPopulation;
         }
 
-        // Find the best individual with the highest fitness value
         int bestFitness = Integer.MIN_VALUE;
         int[] bestMove = null;
         for (int i = 0; i < currentPopulation.length; i++) {
