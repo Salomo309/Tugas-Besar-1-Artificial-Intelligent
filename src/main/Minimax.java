@@ -1,6 +1,6 @@
 package main;
 
-public class Minimax implements BotAlgotithm {
+public class Minimax implements BotAlgorithm {
     private static final int ROW = 8;
     private static final int COL = 8;
 

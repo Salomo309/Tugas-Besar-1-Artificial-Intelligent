@@ -4,15 +4,15 @@ public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
     private char[][] board;
-    private BotAlgotithm algotithm;
+    private BotAlgorithm algorithm;
 
     public Bot() {
         // Initialize the board with empty cells
         board = new char[ROW][COL];
     }
 
-    public void setAlgorithm(BotAlgotithm algorithm) {
-        this.algotithm = algorithm;
+    public void setAlgorithm(BotAlgorithm algorithm) {
+        this.algorithm = algorithm;
     }
 
     public void setBoardState(char[][] newBoard) {
@@ -24,7 +24,7 @@ public class Bot {
     }
 
     public int[] getBestMove() {
-        return algotithm.getBestMove(board);
+        return algorithm.getBestMove(board);
     }
 
 }

@@ -3,7 +3,7 @@ package main;
 import java.util.Arrays;
 import java.util.Random;
 
-class GeneticAlgorithm implements BotAlgotithm {
+class GeneticAlgorithm implements BotAlgorithm {
     private int generations;
     private int rounds;
 
