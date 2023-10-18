@@ -30,8 +30,8 @@ class GeneticAlgorithm implements BotAlgotithm {
         return count;
     }
 
-    public int getFitnessValue(int[] individual) {
-        char[][] board = new char[8][8];
+    public int getFitnessValue(int[] individual, char[][] boardGame) {
+        char[][] board = boardGame;
         int currentPlayer = 1;
 
         for (int i = 0; i < individual.length; i++) {
@@ -68,21 +68,21 @@ class GeneticAlgorithm implements BotAlgotithm {
         return fitnessValue;
     }
 
-    public int[][] selection(int[][] population) {
+    public int[][] selection(int[][] population, char[][] boardGame) {
         Random random = new Random();
         int[][] parents = new int[16][];
 
         int total = 0;
 
         for (int i = 0; i < population.length; i++) {
-            total += this.getFitnessValue(population[i]);
+            total += this.getFitnessValue(population[i], boardGame);
         }
 
         double[] range = new double[16];
-        range[0] = (double) this.getFitnessValue(population[0]) * 100 / total;
+        range[0] = (double) this.getFitnessValue(population[0], boardGame) * 100 / total;
         // System.out.println(range[0]);
         for (int i = 1; i < 16; i++) {
-            range[i] = range[i - 1] + (double) this.getFitnessValue(population[i]) * 100 / total;
+            range[i] = range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total;
         }
 
         for (int i = 0; i < 16; i++) {
@@ -146,14 +146,14 @@ class GeneticAlgorithm implements BotAlgotithm {
     //     }
     // }
 
-    public int[] getBestMove(int generations, int rounds) {
+    public int[] getBestMove(int generations, int rounds, char[][] boardGame) {
         int[][] currentPopulation = generateInitialPopulation(rounds);
 
         for (int generation = 0; generation < generations; generation++) {
             // System.out.println(generation);
 
             // Selection
-            int[][] selectedParents = selection(currentPopulation);
+            int[][] selectedParents = selection(currentPopulation, boardGame);
 
             // Crossover
             int[][] newPopulation = new int[16][rounds];
@@ -176,7 +176,7 @@ class GeneticAlgorithm implements BotAlgotithm {
         int bestFitness = Integer.MIN_VALUE;
         int[] bestMove = null;
         for (int i = 0; i < currentPopulation.length; i++) {
-            int fitness = getFitnessValue(currentPopulation[i]);
+            int fitness = getFitnessValue(currentPopulation[i], boardGame);
             if (fitness > bestFitness) {
                 bestFitness = fitness;
                 bestMove = currentPopulation[i];
@@ -186,14 +186,9 @@ class GeneticAlgorithm implements BotAlgotithm {
         return bestMove;
     }
 
-    public int[] getBestMove(char[][] board) {
-        // TODO: implementasi getBestMove dengan argumen board dari Bot.java
-        return null;
-    }
-
     public static void main(String[] args) {
-        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-        System.out.println(geneticAlgorithm.getBestMove(500, 28));
+        // GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
+        // System.out.println(geneticAlgorithm.getBestMove(500, 28, boardGame));
 
         // // Buat populasi awal
         // int rounds = 28;
