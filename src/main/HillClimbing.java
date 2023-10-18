@@ -49,7 +49,7 @@ public class HillClimbing implements BotAlgorithm {
         // looping through all board
         for (int k = 0; k < ROW; k++) {
             for (int l = 0; l < COL; l++) {
-                if (!((k == i && l == j - 1) || (k == i && l != j + 1) || (k == i + 1 && l == j) || (k == i + 1 && l == j))) {
+                if (!((k == i && l == j - 1) || (k == i && l == j + 1) || (k == i - 1 && l == j) || (k == i + 1 && l == j))) {
                     if (board[k][l] == markBot) {
                         score++;
                     }
