@@ -3,7 +3,7 @@ package main;
 import java.util.Arrays;
 import java.util.Random;
 
-class GeneticAlgorithm {
+class GeneticAlgorithm implements BotAlgotithm {
     public int[][] generateInitialPopulation(int rounds) {
         int[][] initialPopulation = new int[16][rounds];
         Random random = new Random();
@@ -68,8 +68,6 @@ class GeneticAlgorithm {
         return fitnessValue;
     }
 
-
-
     public int[][] selection(int[][] population) {
         Random random = new Random();
         int[][] parents = new int[16][];
@@ -88,7 +86,7 @@ class GeneticAlgorithm {
         }
 
         for (int i = 0; i < 16; i++) {
-            double randomValue = random.nextDouble(100);
+            double randomValue = random.nextDouble() * 100;
 
             for (int j = 0; j < 16; j++) {
                 if (randomValue > (j > 0 ? range[j - 1] : 0) && randomValue <= range[j]) {
@@ -186,6 +184,11 @@ class GeneticAlgorithm {
         }
 
         return bestMove;
+    }
+
+    public int[] getBestMove(char[][] board) {
+        // TODO: implementasi getBestMove dengan argumen board dari Bot.java
+        return null;
     }
 
     public static void main(String[] args) {
