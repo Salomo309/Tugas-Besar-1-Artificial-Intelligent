@@ -1,5 +1,7 @@
 package main;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,6 +18,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 
 import java.io.IOException;
+import java.nio.channels.InterruptedByTimeoutException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The OutputFrameController class.  It controls button input from the users when
@@ -53,13 +57,18 @@ public class OutputFrameController {
     private int roundsLeft;
     private boolean isBotFirst;
     private boolean isBotVsBot;
-    private Bot bot;
+    private boolean gameOver;
+    private Bot botO;
+    private Bot botX;
 
 
     private static final int ROW = 8;
     private static final int COL = 8;
     private Button[][] buttons = new Button[ROW][COL];
     private char[][] board = new char[ROW][COL];
+
+    private Task<Void> moveBotO;
+    private Task<Void> moveBotX;
 
 
     /**
@@ -73,34 +82,59 @@ public class OutputFrameController {
      * @param isBotFirst True if bot is first, false otherwise.
      *
      */
-    void getInput(String name1, String name2, String rounds, boolean isBotFirst, boolean isBotVsBot, String algorithm){
+    void getInput(String name1, String name2, String rounds, boolean isBotFirst, boolean isBotVsBot, String algorithmO, String algorithmX){
         this.playerXName.setText(name1);
         this.playerOName.setText(name2);
         this.roundsLeftLabel.setText(rounds);
         this.roundsLeft = Integer.parseInt(rounds);
         this.isBotFirst = isBotFirst;
         this.isBotVsBot = isBotVsBot;
-        switch (algorithm) {
+
+        // Start bot
+        this.botO = new Bot('O');
+        this.botO.setBoardState(this.board);
+        switch (algorithmO) {
             case "Minimax":
-                this.bot.setAlgorithm(new Minimax());
+                this.botO.setAlgorithm(new Minimax());
                 break;
             case "Hill Climbing":
-                this.bot.setAlgorithm(new HillClimbing());
+                this.botO.setAlgorithm(new HillClimbing());
                 break;
             case "Genetic Algorithm":
-                this.bot.setAlgorithm(new GeneticAlgorithm(500, roundsLeft, this.isBotFirst));
+                this.botO.setAlgorithm(new GeneticAlgorithm(500, roundsLeft, this.isBotFirst));
                 break;
             default:
                 assert false: "Unreachable";
                 break;
         }
+        
+        if (this.isBotVsBot) {
+            this.botX = new Bot('X');
+            this.botX.setAlgorithm(new Minimax());
+            this.botX.setBoardState(this.board);
+            switch (algorithmX) {
+                case "Minimax":
+                    this.botX.setAlgorithm(new Minimax());
+                    break;
+                case "Hill Climbing":
+                    this.botX.setAlgorithm(new HillClimbing());
+                    break;
+                case "Genetic Algorithm":
+                    this.botX.setAlgorithm(new GeneticAlgorithm(500, roundsLeft, this.isBotFirst));
+                    break;
+                default:
+                    assert false: "Unreachable";
+                    break;
+            }
+        }
 
-        // // Start bot
-        // this.bot = new Bot();
-        // this.playerXTurn = !isBotFirst;
-        // if (this.isBotFirst) {
-        //     this.moveBot();
-        // }
+        this.playerXTurn = !isBotFirst;
+
+        if (this.isBotFirst) {
+            this.moveBot(botO);
+        } else if (this.isBotVsBot) {
+            this.moveBot(botX);
+        }
     }
 
 
@@ -113,13 +147,6 @@ public class OutputFrameController {
      */
     @FXML
     private void initialize() {
-
-        // Start bot
-        this.bot = new Bot();
-        this.playerXTurn = !isBotFirst;
-        if (this.isBotFirst) {
-            this.moveBot();
-        }
 
         // Construct game board with 8 rows.
         for (int i = 0; i < ROW; i++) {
@@ -194,11 +221,8 @@ public class OutputFrameController {
         this.playerXScoreLabel.setText("4");
         this.playerOScoreLabel.setText("4");
 
-        this.playerXTurn = true;
         this.playerXScore = 4;
         this.playerOScore = 4;
-
-        this.bot.setBoardState(this.board);
     }
 
 
@@ -210,7 +234,7 @@ public class OutputFrameController {
      * @param j The column number of the button clicked.
      *
      */
-    private void selectedCoordinates(int i, int j){
+    private synchronized void selectedCoordinates(int i, int j){
         // Invalid when a button with an X or an O is clicked.
         if (!this.buttons[i][j].getText().equals(""))
             new Alert(Alert.AlertType.ERROR, "Invalid coordinates: Try again!").showAndWait();
@@ -240,7 +264,9 @@ public class OutputFrameController {
                 }
 
                 // Bot's turn
-                this.moveBot();
+                if (!gameOver) {
+                    this.moveBot(botO);
+                }
             }
             else {
                 this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
@@ -261,6 +287,10 @@ public class OutputFrameController {
 
                 if (!isBotFirst && this.roundsLeft == 0) { // Game has terminated.
                     this.endOfGame();       // Determine & announce the winner.
+                }
+
+                if (isBotVsBot && !gameOver) {
+                    this.moveBot(botX);
                 }
             }
         }
@@ -314,7 +344,7 @@ public class OutputFrameController {
         this.playerXScoreLabel.setText(String.valueOf(this.playerXScore));
         this.playerOScoreLabel.setText(String.valueOf(this.playerOScore));
 
-        this.bot.setBoardState(this.board);
+        // this.botO.setBoardState(this.board);
     }
 
     private void setPlayerScore(int i, int j){
@@ -373,6 +403,8 @@ public class OutputFrameController {
         for (int i = 0; i < ROW; i++)
             for (int j = 0; j < COL; j++)
                 this.buttons[i][j].setDisable(true);
+
+        gameOver = true;
     }
 
 
@@ -406,17 +438,27 @@ public class OutputFrameController {
         primaryStage.show();
     }
 
-    private void moveBot() {
-        int[] botMove = this.bot.getBestMove();
-        int i = botMove[0];
-        int j = botMove[1];
+    private void moveBot(Bot bot) {
+        Thread taskThread = new Thread(() -> {
+            Platform.runLater(() -> {
+                int[] botMove = bot.getBestMove();
+                int i = botMove[0];
+                int j = botMove[1];
+                
+                if (!buttons[i][j].getText().equals("")) {
+                    new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
+                    System.exit(1);
+                    return;
+                }
 
-        if (!this.buttons[i][j].getText().equals("")) {
-            new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
-            System.exit(1);
-            return;
-        }
-
-        this.selectedCoordinates(i, j);
+                selectedCoordinates(i, j);
+            });
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                System.exit(1);
+            }
+        });
+        taskThread.start();
     }
 }

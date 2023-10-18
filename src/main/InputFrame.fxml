@@ -44,14 +44,21 @@
                     <Font name="Arial Bold" size="12"/>
                 </font>
             </Label>
-            <CheckBox fx:id="isBotVsBot" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            <CheckBox fx:id="isBotVsBot" GridPane.rowIndex="4" GridPane.columnIndex="1" onAction="#setAlgorithmXVisibility" />
 
-            <Label text="Algorithm: " GridPane.rowIndex="5" GridPane.columnIndex="0">
+            <Label fx:id="algorithmXLabel" text="Algorithm (X): " GridPane.rowIndex="5" GridPane.columnIndex="0" visible="false">
                 <font>
                     <Font name="Arial Bold" size="12"/>
                 </font>
             </Label>
-            <ComboBox fx:id="algorithm" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="Infinity" />
+            <ComboBox fx:id="algorithmX" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="Infinity" visible="false" />
+
+            <Label text="Algorithm (O): " GridPane.rowIndex="6" GridPane.columnIndex="0">
+                <font>
+                    <Font name="Arial Bold" size="12"/>
+                </font>
+            </Label>
+            <ComboBox fx:id="algorithmO" GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="Infinity" />
         </GridPane>
     </top>
 

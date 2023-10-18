@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +41,13 @@ public class InputFrameController{
     private ComboBox<String> numberOfRounds;
 
     @FXML
-    private ComboBox<String> algorithm;
+    private ComboBox<String> algorithmO;
+
+    @FXML
+    private Label algorithmXLabel;
+
+    @FXML
+    private ComboBox<String> algorithmX;
 
     /**
      * Initialize the dropdown ComboBox with a list of items that are allowed to be selected.
@@ -55,10 +62,15 @@ public class InputFrameController{
         this.numberOfRounds.setItems(numberOfRoundsDropdown);
         this.numberOfRounds.getSelectionModel().select(0);
 
-        this.algorithm.getItems().add("Minimax");
-        this.algorithm.getItems().add("Hill Climbing");
-        this.algorithm.getItems().add("Genetic Algorithm");
-        this.algorithm.getSelectionModel().select(0);
+        this.algorithmO.getItems().add("Minimax");
+        this.algorithmO.getItems().add("Hill Climbing");
+        this.algorithmO.getItems().add("Genetic Algorithm");
+        this.algorithmO.getSelectionModel().select(0);
+
+        this.algorithmX.getItems().add("Minimax");
+        this.algorithmX.getItems().add("Hill Climbing");
+        this.algorithmX.getItems().add("Genetic Algorithm");
+        this.algorithmX.getSelectionModel().select(0);
     }
 
 
@@ -72,6 +84,17 @@ public class InputFrameController{
         this.player1.setText("");
         this.player2.setText("");
         this.numberOfRounds.getSelectionModel().select(0);
+    }
+
+    @FXML
+    private void setAlgorithmXVisibility() {
+        if (this.isBotVsBot.isSelected()) {
+            this.algorithmXLabel.setVisible(true);
+            this.algorithmX.setVisible(true);
+        } else {
+            this.algorithmXLabel.setVisible(false);
+            this.algorithmX.setVisible(false);
+        }
     }
 
 
@@ -94,7 +117,7 @@ public class InputFrameController{
 
             // Get controller of output frame and pass input including player names and number of rounds chosen.
             OutputFrameController outputFC = loader.getController();
-            outputFC.getInput(this.player1.getText(), this.player2.getText(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected(), this.isBotVsBot.isSelected(), this.algorithm.getValue());
+            outputFC.getInput(this.player1.getText(), this.player2.getText(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected(), this.isBotVsBot.isSelected(), this.algorithmO.getValue(), this.algorithmX.getValue());
 
             // Open the new frame.
             Stage secondaryStage = new Stage();
