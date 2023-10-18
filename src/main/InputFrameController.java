@@ -24,7 +24,12 @@ import java.io.IOException;
  */
 public class InputFrameController{
 
+    @FXML
     public CheckBox isBotFirst;
+
+    @FXML
+    public CheckBox isBotVsBot;
+
     @FXML
     private TextField player1;
 
@@ -34,6 +39,8 @@ public class InputFrameController{
     @FXML
     private ComboBox<String> numberOfRounds;
 
+    @FXML
+    private ComboBox<String> algorithm;
 
     /**
      * Initialize the dropdown ComboBox with a list of items that are allowed to be selected.
@@ -47,6 +54,11 @@ public class InputFrameController{
                 "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28");
         this.numberOfRounds.setItems(numberOfRoundsDropdown);
         this.numberOfRounds.getSelectionModel().select(0);
+
+        this.algorithm.getItems().add("Minimax");
+        this.algorithm.getItems().add("Hill Climbing");
+        this.algorithm.getItems().add("Genetic Algorithm");
+        this.algorithm.getSelectionModel().select(0);
     }
 
 
@@ -82,7 +94,7 @@ public class InputFrameController{
 
             // Get controller of output frame and pass input including player names and number of rounds chosen.
             OutputFrameController outputFC = loader.getController();
-            outputFC.getInput(this.player1.getText(), this.player2.getText(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected());
+            outputFC.getInput(this.player1.getText(), this.player2.getText(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected(), this.isBotVsBot.isSelected(), this.algorithm.getValue());
 
             // Open the new frame.
             Stage secondaryStage = new Stage();

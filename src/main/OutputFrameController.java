@@ -52,6 +52,7 @@ public class OutputFrameController {
     private int playerOScore;
     private int roundsLeft;
     private boolean isBotFirst;
+    private boolean isBotVsBot;
     private Bot bot;
 
 
@@ -72,12 +73,27 @@ public class OutputFrameController {
      * @param isBotFirst True if bot is first, false otherwise.
      *
      */
-    void getInput(String name1, String name2, String rounds, boolean isBotFirst){
+    void getInput(String name1, String name2, String rounds, boolean isBotFirst, boolean isBotVsBot, String algorithm){
         this.playerXName.setText(name1);
         this.playerOName.setText(name2);
         this.roundsLeftLabel.setText(rounds);
         this.roundsLeft = Integer.parseInt(rounds);
         this.isBotFirst = isBotFirst;
+        this.isBotVsBot = isBotVsBot;
+        switch (algorithm) {
+            case "Minimax":
+                this.bot.setAlgorithm(new Minimax());
+                break;
+            case "Hill Climbing":
+                this.bot.setAlgorithm(new HillClimbing());
+                break;
+            case "Genetic Algorithm":
+                this.bot.setAlgorithm(new GeneticAlgorithm(500, roundsLeft));
+                break;
+            default:
+                assert false: "Unreachable";
+                break;
+        }
 
         // // Start bot
         // this.bot = new Bot();
@@ -100,7 +116,6 @@ public class OutputFrameController {
 
         // Start bot
         this.bot = new Bot();
-        this.bot.setAlgorithm(new GeneticAlgorithm(100, roundsLeft));
         this.playerXTurn = !isBotFirst;
         if (this.isBotFirst) {
             this.moveBot();

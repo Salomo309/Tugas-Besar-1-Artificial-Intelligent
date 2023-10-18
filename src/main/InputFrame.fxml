@@ -11,7 +11,7 @@
     <padding><Insets top="5" bottom="5" left="5" right="5"/></padding>
     <top>
         <GridPane>
-            <Label text="Player Name (X): " GridPane.rowIndex="0" GridPane.columnIndex="0">
+            <Label fx:id="playerLabel" text="Player Name (X): " GridPane.rowIndex="0" GridPane.columnIndex="0">
                 <font>
                     <Font name="Arial Bold" size="12"/>
                 </font>
@@ -38,6 +38,20 @@
                 </font>
             </Label>
             <CheckBox fx:id="isBotFirst" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+            <Label text="Bot vs bot: " GridPane.rowIndex="4" GridPane.columnIndex="0">
+                <font>
+                    <Font name="Arial Bold" size="12"/>
+                </font>
+            </Label>
+            <CheckBox fx:id="isBotVsBot" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+            <Label text="Algorithm: " GridPane.rowIndex="5" GridPane.columnIndex="0">
+                <font>
+                    <Font name="Arial Bold" size="12"/>
+                </font>
+            </Label>
+            <ComboBox fx:id="algorithm" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="Infinity" />
         </GridPane>
     </top>
 
