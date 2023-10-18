@@ -16,27 +16,36 @@ class GeneticAlgorithm implements BotAlgorithm {
         this.isBotFirst = isBotFirst;
     }
 
-    public int[][] generateInitialPopulation(int rounds) {
+    public int[][] generateInitialPopulation(int rounds, char[][] board) {
         int[][] initialPopulation = new int[16][rounds];
         Random random = new Random();
 
         for (int i = 0; i < 16; i++) {
         Set<Integer> uniquePositions = new HashSet<>();
 
-        for (int j = 0; j < rounds; j++) {
-            int position;
+            for (int j = 0; j < rounds; j++) {
+                int position;
 
-            // ini ngecek supaya ga duplikat
-            do {
-                position = random.nextInt(64) + 1;
-            } while (uniquePositions.contains(position));
+                // ini ngecek supaya ga duplikat
+                do {
+                    position = random.nextInt(64) + 1;
+                } while ((uniquePositions.contains(position)) && isPositionOccupied(position, board));
 
-            uniquePositions.add(position);
-            initialPopulation[i][j] = position;
+                uniquePositions.add(position);
+                initialPopulation[i][j] = position;
+            }
         }
+        return initialPopulation;
     }
 
-        return initialPopulation;
+    public boolean isPositionOccupied(int position, char[][] board) {
+        int row = (position - 1) / 8;
+        int col = (position - 1) % 8;
+        if (board[row][col] != 'X' && board[row][col] != 'O') {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public int countMarks(char[][] board, char mark) {
@@ -139,7 +148,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         return parents;
     }
 
-    public int[][] crossover(int[] parent1, int[] parent2) {
+    public int[][] crossover(int[] parent1, int[] parent2, char[][] boardGame) {
         int crossoverPoint = parent1.length / 2;
         int[] child1 = new int[parent1.length];
         int[] child2 = new int[parent1.length];
@@ -162,9 +171,15 @@ class GeneticAlgorithm implements BotAlgorithm {
                     count++;
                     if (count > 1) {
                         int newUniqueValue = generateUniqueValue(child1);
-                        child1[i] = newUniqueValue;
-                        i = -1; // Start over to recheck from the beginning
-                        break;
+
+                        if (isPositionOccupied(newUniqueValue, boardGame)) {
+                            do {
+                                newUniqueValue = generateUniqueValue(child1);
+                            } while (isPositionOccupied(newUniqueValue, boardGame));
+                            child1[i] = newUniqueValue;
+                            i = -1;
+                            break;
+                        }
                     }
                 }
             }
@@ -178,9 +193,15 @@ class GeneticAlgorithm implements BotAlgorithm {
                     count++;
                     if (count > 1) {
                         int newUniqueValue = generateUniqueValue(child2);
-                        child2[i] = newUniqueValue;
-                        i = -1; // Start over to recheck from the beginning
-                        break;
+
+                        if (isPositionOccupied(newUniqueValue, boardGame)) {
+                            do {
+                                newUniqueValue = generateUniqueValue(child2);
+                            } while (isPositionOccupied(newUniqueValue, boardGame));
+                            child2[i] = newUniqueValue;
+                            i = -1;
+                            break;
+                        }
                     }
                 }
             }
@@ -192,7 +213,7 @@ class GeneticAlgorithm implements BotAlgorithm {
     }
 
     // bantuin ngecek crossover
-    private int generateUniqueValue(int[] array) {
+    public int generateUniqueValue(int[] array) {
         Random random = new Random();
         int value = 0;
         boolean isUnique = false;
@@ -209,7 +230,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         return value;
     }
 
-    public int[] mutate(int[] individual) {
+    public int[] mutate(int[] individual, char[][] boardGame) {
         Random random = new Random();
         Set<Integer> usedPositions = new HashSet<>();
 
@@ -220,7 +241,7 @@ class GeneticAlgorithm implements BotAlgorithm {
         do {
             mutationIndex = random.nextInt(individual.length);
             mutationValue = random.nextInt(64) + 1;
-        } while (!usedPositions.add(mutationValue));
+        } while ((!usedPositions.add(mutationValue)) && isPositionOccupied(mutationValue, boardGame));
 
         int[] mutatedIndividual = Arrays.copyOf(individual, individual.length);
         mutatedIndividual[mutationIndex] = mutationValue;
@@ -228,26 +249,27 @@ class GeneticAlgorithm implements BotAlgorithm {
         return mutatedIndividual;
     }
 
-    // public void printIndividual(int[] individual) {
-    //     System.out.print("Individual Chromosome: [");
-    //     for (int i = 0; i < individual.length; i++) {
-    //         System.out.print(individual[i]);
-    //         if (i < individual.length - 1) {
-    //             System.out.print(", ");
-    //         }
-    //     }
-    //     System.out.println("]");
-    // }
+    public void printIndividual(int[] individual) {
+        System.out.print("Individual Chromosome: [");
+        for (int i = 0; i < individual.length; i++) {
+            System.out.print(individual[i]);
+            if (i < individual.length - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println("]");
+    }
 
-    // public void printParents(int[][] parents) {
-    //     for (int i = 0; i < parents.length; i++) {
-    //         System.out.print("Parent " + (i + 1) + ": ");
-    //         printIndividual(parents[i]);
-    //     }
-    // }
+    public void printParents(int[][] parents) {
+        for (int i = 0; i < parents.length; i++) {
+            System.out.print("Parent " + (i + 1) + ": ");
+            printIndividual(parents[i]);
+        }
+    }
 
     public int[] getBestMove(int generations, int rounds, char[][] boardGame, boolean isBotFirst) {
-        int[][] currentPopulation = generateInitialPopulation(rounds);
+        int[][] currentPopulation = generateInitialPopulation(rounds, boardGame);
+        Random random = new Random();
         // printParents(currentPopulation);
 
         for (int generation = 0; generation < generations; generation++) {
@@ -261,14 +283,14 @@ class GeneticAlgorithm implements BotAlgorithm {
             for (int i = 1; i < 16; i += 2) {
                 int[] parent1 = selectedParents[i - 1];
                 int[] parent2 = selectedParents[i];
-                int[][] children = crossover(parent1, parent2);
+                int[][] children = crossover(parent1, parent2, boardGame);
                 newPopulation[i - 1] = children[0];
                 newPopulation[i] = children[1];
             }
 
             // Mutation
             for (int i = 0; i < newPopulation.length; i++) {
-                newPopulation[i] = mutate(newPopulation[i]);
+                newPopulation[i] = mutate(newPopulation[i], boardGame);
             }
 
             currentPopulation = newPopulation;
@@ -282,6 +304,19 @@ class GeneticAlgorithm implements BotAlgorithm {
                 bestFitness = fitness;
                 bestMove = currentPopulation[i];
             }
+        }
+
+        int position = bestMove[0];
+
+        if (isPositionOccupied(position, boardGame)) {
+
+            int unoccupiedPosition;
+
+            do {
+                unoccupiedPosition = random.nextInt(64) + 1;
+            } while (isPositionOccupied(unoccupiedPosition, boardGame));
+
+            bestMove[0] = unoccupiedPosition;
         }
 
         return bestMove;
@@ -298,10 +333,11 @@ class GeneticAlgorithm implements BotAlgorithm {
         this.rounds--;
 
         int position = result[0];
-        int row = (position - 1) / 8;  // Menghitung baris
-        int col = (position - 1) % 8;  // Menghitung kolom
+        int row = (position - 1) / 8;
+        int col = (position - 1) % 8;
 
         int[] resultPosition = {row, col};
+        System.out.println(row + " dan " + col);
 
         return resultPosition;
     }
