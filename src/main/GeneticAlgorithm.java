@@ -90,14 +90,20 @@ class GeneticAlgorithm implements BotAlgorithm {
         range[0] = (double) this.getFitnessValue(population[0], boardGame) * 100 / total;
         // System.out.println(range[0]);
         for (int i = 1; i < 16; i++) {
-            range[i] = range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total;
+            if (range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total < 0) {
+                range[i] = 0;
+            } else {
+
+                range[i] = range[i - 1] + (double) this.getFitnessValue(population[i], boardGame) * 100 / total;
+            }
         }
+        range[15] = 100;
 
         for (int i = 0; i < 16; i++) {
-            double randomValue = random.nextDouble() * 100;
+            double randomValue = random.nextDouble(100);
 
             for (int j = 0; j < 16; j++) {
-                if (randomValue > (j > 0 ? range[j - 1] : 0) && randomValue <= range[j]) {
+                if (randomValue <= range[j]) {
                     parents[i] = population[j];
                     break;
                 }
@@ -158,10 +164,11 @@ class GeneticAlgorithm implements BotAlgorithm {
         int[][] currentPopulation = generateInitialPopulation(rounds);
 
         for (int generation = 0; generation < generations; generation++) {
-            // System.out.println(generation);
+            System.out.println(generation);
 
             // Selection
             int[][] selectedParents = selection(currentPopulation, boardGame);
+            // printParents(selectedParents);
 
             // Crossover
             int[][] newPopulation = new int[16][rounds];
