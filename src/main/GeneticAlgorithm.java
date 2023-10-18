@@ -201,7 +201,9 @@ class GeneticAlgorithm implements BotAlgorithm {
                 boardGame[i][j] = board[i][j];
             }
         }
-        return getBestMove(this.generations, this.rounds, boardGame);
+        int[] result =  getBestMove(this.generations, this.rounds, boardGame);
+        this.rounds--;
+        return result;
     }
 
     public static void main(String[] args) {
