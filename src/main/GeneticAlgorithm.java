@@ -91,7 +91,7 @@ class GeneticAlgorithm {
             double randomValue = random.nextDouble(100);
 
             for (int j = 0; j < 16; j++) {
-                if (randomValue <= range[j]) {
+                if (randomValue > (j > 0 ? range[j - 1] : 0) && randomValue <= range[j]) {
                     parents[i] = population[j];
                     break;
                 }
@@ -153,7 +153,7 @@ class GeneticAlgorithm {
 
         for (int generation = 0; generation < generations; generation++) {
             // System.out.println(generation);
-            
+
             // Selection
             int[][] selectedParents = selection(currentPopulation);
 
