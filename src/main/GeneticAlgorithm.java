@@ -1,15 +1,19 @@
 package main;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 class GeneticAlgorithm implements BotAlgorithm {
     private int generations;
     private int rounds;
+    private boolean isBotFirst;
 
-    public GeneticAlgorithm(int generations, int rounds) {
+    public GeneticAlgorithm(int generations, int rounds, boolean isBotFirst) {
         this.generations = generations;
         this.rounds = rounds;
+        this.isBotFirst = isBotFirst;
     }
 
     public int[][] generateInitialPopulation(int rounds) {
@@ -17,11 +21,20 @@ class GeneticAlgorithm implements BotAlgorithm {
         Random random = new Random();
 
         for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < rounds; j++) {
-                int position = random.nextInt(64) + 1;
-                initialPopulation[i][j] = position;
-            }
+        Set<Integer> uniquePositions = new HashSet<>();
+
+        for (int j = 0; j < rounds; j++) {
+            int position;
+
+            // ini ngecek supaya ga duplikat
+            do {
+                position = random.nextInt(64) + 1;
+            } while (uniquePositions.contains(position));
+
+            uniquePositions.add(position);
+            initialPopulation[i][j] = position;
         }
+    }
 
         return initialPopulation;
     }
@@ -39,7 +52,13 @@ class GeneticAlgorithm implements BotAlgorithm {
     }
 
     public int getFitnessValue(int[] individual, char[][] boardGame, boolean isBotFirst) {
-        char[][] board = boardGame;
+        char[][] board = new char[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = boardGame[i][j];
+            }
+        }
         int currentPlayer = 1;
 
         for (int i = 0; i < individual.length; i++) {
@@ -134,15 +153,75 @@ class GeneticAlgorithm implements BotAlgorithm {
             child1[i] = parent2[i];
             child2[i] = parent1[i];
         }
+
+        // Check and fix duplicates in child1
+        for (int i = 0; i < child1.length; i++) {
+            int count = 0;
+            for (int j = 0; j < child1.length; j++) {
+                if (child1[i] == child1[j]) {
+                    count++;
+                    if (count > 1) {
+                        int newUniqueValue = generateUniqueValue(child1);
+                        child1[i] = newUniqueValue;
+                        i = -1; // Start over to recheck from the beginning
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check and fix duplicates in child2
+        for (int i = 0; i < child2.length; i++) {
+            int count = 0;
+            for (int j = 0; j < child2.length; j++) {
+                if (child2[i] == child2[j]) {
+                    count++;
+                    if (count > 1) {
+                        int newUniqueValue = generateUniqueValue(child2);
+                        child2[i] = newUniqueValue;
+                        i = -1; // Start over to recheck from the beginning
+                        break;
+                    }
+                }
+            }
+        }
+
         int[][] children = {child1, child2};
 
         return children;
     }
 
+    // bantuin ngecek crossover
+    private int generateUniqueValue(int[] array) {
+        Random random = new Random();
+        int value = 0;
+        boolean isUnique = false;
+        while (!isUnique) {
+            value = (int) (random.nextInt(64) + 1);
+            isUnique = true;
+            for (int i : array) {
+                if (i == value) {
+                    isUnique = false;
+                    break;
+                }
+            }
+        }
+        return value;
+    }
+
     public int[] mutate(int[] individual) {
         Random random = new Random();
-        int mutationIndex = random.nextInt(individual.length);
-        int mutationValue = random.nextInt(64) + 1;
+        Set<Integer> usedPositions = new HashSet<>();
+
+        int mutationIndex;
+        int mutationValue;
+
+        // sama kaya tadi, ngecek supaya ga duplikat
+        do {
+            mutationIndex = random.nextInt(individual.length);
+            mutationValue = random.nextInt(64) + 1;
+        } while (!usedPositions.add(mutationValue));
+
         int[] mutatedIndividual = Arrays.copyOf(individual, individual.length);
         mutatedIndividual[mutationIndex] = mutationValue;
 
@@ -169,9 +248,9 @@ class GeneticAlgorithm implements BotAlgorithm {
 
     public int[] getBestMove(int generations, int rounds, char[][] boardGame, boolean isBotFirst) {
         int[][] currentPopulation = generateInitialPopulation(rounds);
+        // printParents(currentPopulation);
 
         for (int generation = 0; generation < generations; generation++) {
-            System.out.println(generation);
 
             // Selection
             int[][] selectedParents = selection(currentPopulation, boardGame, isBotFirst);
@@ -208,16 +287,23 @@ class GeneticAlgorithm implements BotAlgorithm {
         return bestMove;
     }
 
-    public int[] getBestMove(char[][] board, boolean isBotFirst) {
+    public int[] getBestMove(char[][] board) {
         char[][] boardGame = new char[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 boardGame[i][j] = board[i][j];
             }
         }
-        int[] result =  getBestMove(this.generations, this.rounds, boardGame, isBotFirst);
+        int[] result =  getBestMove(this.generations, this.rounds, boardGame, this.isBotFirst);
         this.rounds--;
-        return result;
+
+        int position = result[0];
+        int row = (position - 1) / 8;  // Menghitung baris
+        int col = (position - 1) % 8;  // Menghitung kolom
+
+        int[] resultPosition = {row, col};
+
+        return resultPosition;
     }
 
     public static void main(String[] args) {
