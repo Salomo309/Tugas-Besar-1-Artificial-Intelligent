@@ -66,6 +66,11 @@ public class InputFrameController{
         this.algorithmO.getItems().add("Hill Climbing");
         this.algorithmO.getItems().add("Genetic Algorithm");
         this.algorithmO.getSelectionModel().select(0);
+
+        this.algorithmX.getItems().add("Minimax");
+        this.algorithmX.getItems().add("Hill Climbing");
+        this.algorithmX.getItems().add("Genetic Algorithm");
+        this.algorithmX.getSelectionModel().select(0);
     }
 
 
