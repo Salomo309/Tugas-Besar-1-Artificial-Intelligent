@@ -88,7 +88,7 @@ public class OutputFrameController {
                 this.bot.setAlgorithm(new HillClimbing());
                 break;
             case "Genetic Algorithm":
-                this.bot.setAlgorithm(new GeneticAlgorithm(500, roundsLeft));
+                this.bot.setAlgorithm(new GeneticAlgorithm(500, roundsLeft, this.isBotFirst));
                 break;
             default:
                 assert false: "Unreachable";
@@ -148,7 +148,7 @@ public class OutputFrameController {
                 final int finalI = i;
                 final int finalJ = j;
                 this.buttons[i][j].setOnAction(event -> this.selectedCoordinates(finalI, finalJ));
-                
+
                 board[i][j] = '-';
             }
         }
@@ -410,7 +410,7 @@ public class OutputFrameController {
         int[] botMove = this.bot.getBestMove();
         int i = botMove[0];
         int j = botMove[1];
-        
+
         if (!this.buttons[i][j].getText().equals("")) {
             new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
             System.exit(1);
