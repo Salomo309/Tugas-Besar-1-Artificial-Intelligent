@@ -100,7 +100,7 @@ public class OutputFrameController {
 
         // Start bot
         this.bot = new Bot();
-        this.bot.setAlgorithm(new Minimax());
+        this.bot.setAlgorithm(new GeneticAlgorithm(100, roundsLeft));
         this.playerXTurn = !isBotFirst;
         if (this.isBotFirst) {
             this.moveBot();

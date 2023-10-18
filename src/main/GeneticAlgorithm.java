@@ -4,6 +4,14 @@ import java.util.Arrays;
 import java.util.Random;
 
 class GeneticAlgorithm implements BotAlgotithm {
+    private int generations;
+    private int rounds;
+
+    public GeneticAlgorithm(int generations, int rounds) {
+        this.generations = generations;
+        this.rounds = rounds;
+    }
+
     public int[][] generateInitialPopulation(int rounds) {
         int[][] initialPopulation = new int[16][rounds];
         Random random = new Random();
@@ -184,6 +192,16 @@ class GeneticAlgorithm implements BotAlgotithm {
         }
 
         return bestMove;
+    }
+
+    public int[] getBestMove(char[][] board) {
+        char[][] boardGame = new char[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                boardGame[i][j] = board[i][j];
+            }
+        }
+        return getBestMove(this.generations, this.rounds, boardGame);
     }
 
     public static void main(String[] args) {
