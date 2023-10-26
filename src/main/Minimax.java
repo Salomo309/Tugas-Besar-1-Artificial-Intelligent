@@ -25,7 +25,7 @@ public class Minimax implements BotAlgorithm {
         BoardIterator it = new BoardIterator(board, mark);
         char[][] state;
         while ((state = it.next()) != null) {
-            int score = minimax(state, Math.min(3, Math.floorDiv(getEmptyCells(state), 2)), Integer.MIN_VALUE, Integer.MAX_VALUE, false, markBot, markEnemy);
+            int score = minimax(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false, markBot, markEnemy);
             // System.out.printf("Score for move (%d, %d): %d\n", it.getMove()[0], it.getMove()[1], score);
             if (score > bestScore) {
                 bestScore = score;
@@ -67,18 +67,6 @@ public class Minimax implements BotAlgorithm {
             }
             return minScore;
         }
-    }
-
-    private int getEmptyCells(char[][] board) {
-        int count = 0;
-        for (int i = 0; i < ROW; i++) {
-            for (int j = 0; j < COL; j++) {
-                if (board[i][j] == '-') {
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     private int evaluate(char[][] board, char markBot, char markEnemy) {
